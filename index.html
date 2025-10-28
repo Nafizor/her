@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nafuzor Mini App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            margin: 20px 0;
+            font-size: 32px;
+        }
+        
+        .stats {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        .click-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 25px 50px;
+            font-size: 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .click-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .slider-container {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 15px 0;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 10px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .value {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Nafuzor App</h1>
+        <p>Кликай и двигай ползунки!</p>
+        
+        <div class="stats">
+            <h2>Клики: <span id="clickCount">0</span></h2>
+            <h2>Уровень: <span id="level">1</span></h2>
+        </div>
+        
+        <button class="click-btn" onclick="clickButton()">
+            🔥 КЛИКАЙ!
+        </button>
+        
+        <div class="slider-container">
+            <h3>⚡ Скорость</h3>
+            <input type="range" min="1" max="100" value="50" class="slider" id="speedSlider" oninput="updateSpeed(this.value)">
+            <div class="value" id="speedValue">50%</div>
+        </div>
+        
+        <div class="slider-container">
+            <h3>💪 Сила</h3>
+            <input type="range" min="1" max="100" value="25" class="slider" id="powerSlider" oninput="updatePower(this.value)">
+            <div class="value" id="powerValue">25%</div>
+        </div>
+        
+        <div class="slider-container">
+            <h3>🍀 Удача</h3>
+            <input type="range" min="1" max="100" value="75" class="slider" id="luckSlider" oninput="updateLuck(this.value)">
+            <div class="value" id="luckValue">75%</div>
+        </div>
+    </div>
+
+    <script>
+        let clickCount = 0;
+        let level = 1;
+        
+        // Инициализация Telegram Mini App
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+        
+        function clickButton() {
+            clickCount++;
+            document.getElementById('clickCount').textContent = clickCount;
+            
+            // Повышение уровня каждые 5 кликов
+            if (clickCount % 5 === 0) {
+                level++;
+                document.getElementById('level').textContent = level;
+                tg.showPopup({
+                    title: '🎉 Новый уровень!',
+                    message: `Ты достиг уровня ${level}!`,
+                    buttons: [{ type: 'ok' }]
+                });
+            }
+            
+            // Анимация кнопки
+            const btn = document.querySelector('.click-btn');
+            btn.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                btn.style.transform = 'scale(1)';
+            }, 100);
+            
+            // Отправляем данные в бота
+            tg.sendData(JSON.stringify({
+                action: 'click',
+                count: clickCount,
+                level: level
+            }));
+        }
+        
+        function updateSpeed(value) {
+            document.getElementById('speedValue').textContent = value + '%';
+        }
+        
+        function updatePower(value) {
+            document.getElementById('powerValue').textContent = value + '%';
+        }
+        
+        function updateLuck(value) {
+            document.getElementById('luckValue').textContent = value + '%';
+        }
+        
+        // Встряхивание при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('.container').style.transform = 'scale(0.8)';
+            setTimeout(() => {
+                document.querySelector('.container').style.transform = 'scale(1)';
+                document.querySelector('.container').style.transition = 'transform 0.5s';
+            }, 100);
+        });
+    </script>
+</body>
+</html>
